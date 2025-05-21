@@ -9,6 +9,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -18,10 +19,42 @@ const Register = () => {
   const [isSellerAccount, setIsSellerAccount] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
   const navigate = useNavigate();
+
+  // Email validation regex pattern
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const validateForm = () => {
+    const newErrors: {email?: string; password?: string} = {};
+    let isValid = true;
+
+    // Email validation
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address (e.g., name@example.com)";
+      isValid = false;
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setErrors({});
+    
+    // Validate the form
+    if (!validateForm()) {
+      return;
+    }
     
     if (password !== confirmPassword) {
       toast({
@@ -126,8 +159,12 @@ const Register = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className={errors.email ? "border-red-500" : ""}
                     required
                   />
+                  {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -138,8 +175,12 @@ const Register = () => {
                     placeholder="Create a password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className={errors.password ? "border-red-500" : ""}
                     required
                   />
+                  {errors.password && (
+                    <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -183,6 +224,12 @@ const Register = () => {
                     </Link>
                   </Label>
                 </div>
+                
+                <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+                  <AlertDescription>
+                    Please use a valid email format (example@domain.com) and a password with at least 6 characters.
+                  </AlertDescription>
+                </Alert>
                 
                 <Button 
                   type="submit" 
