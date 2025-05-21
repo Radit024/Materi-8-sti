@@ -99,7 +99,7 @@ export const products: Product[] = [
     id: '8',
     name: 'Organic Quinoa (1lb)',
     price: 5.99,
-    description: 'Nutritious, organic quinoa. A complete protein source that's perfect for any meal.',
+    description: 'Nutritious, organic quinoa. A complete protein source that\'s perfect for any meal.',
     image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e8ac',
     created_at: '2023-01-08T00:00:00Z',
     created_by: 'admin',
