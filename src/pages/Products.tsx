@@ -37,7 +37,7 @@ const Products = () => {
     let result = [...products];
     
     // Filter by category
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       result = result.filter(product => product.category === selectedCategory);
     }
     
@@ -67,7 +67,7 @@ const Products = () => {
   // Update URL when category changes
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    if (value) {
+    if (value && value !== 'all') {
       searchParams.set('category', value);
     } else {
       searchParams.delete('category');
