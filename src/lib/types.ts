@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -30,4 +29,12 @@ export interface CartItem {
 export interface Category {
   id: string;
   name: string;
+}
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  email: string;
+  is_seller: boolean;
+  created_at: string;
 }

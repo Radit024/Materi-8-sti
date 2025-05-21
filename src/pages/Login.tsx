@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,28 +8,45 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // TODO: Replace with actual Supabase authentication
-      // For now, just show a toast notification
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
       toast({
-        title: "Not implemented",
-        description: "Authentication with Supabase will be implemented later.",
+        title: "Login successful",
+        description: "Welcome back to FarmStand!",
+      });
+      
+      // Redirect to home page after successful login
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,14 +8,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSellerAccount, setIsSellerAccount] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,17 +43,51 @@ const Register = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // TODO: Replace with actual Supabase authentication
-      // For now, just show a toast notification
+    try {
+      // Register the user with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+            is_seller: isSellerAccount
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user && isSellerAccount) {
+        // Update the user's profile to mark them as a seller
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ is_seller: true })
+          .eq('id', data.user.id);
+
+        if (updateError) {
+          console.error('Error updating seller status:', updateError);
+        }
+      }
+
       toast({
-        title: "Not implemented",
-        description: "Registration with Supabase will be implemented later.",
+        title: "Account created",
+        description: "Your account has been created successfully. Please check your email for verification.",
+      });
+      
+      // Redirect to login page after successful registration
+      navigate('/login');
+    } catch (error: any) {
+      toast({
+        title: "Registration failed",
+        description: error.message || "Failed to create your account. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -115,6 +152,17 @@ const Register = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="is-seller"
+                    checked={isSellerAccount}
+                    onCheckedChange={(checked) => setIsSellerAccount(!!checked)}
+                  />
+                  <Label htmlFor="is-seller" className="text-sm cursor-pointer">
+                    Register as a seller (allows you to list products)
+                  </Label>
                 </div>
                 
                 <div className="flex items-center space-x-2">
