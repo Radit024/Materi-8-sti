@@ -19,6 +19,7 @@ import { products, categories } from '@/lib/data';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -32,9 +33,26 @@ const Products = () => {
     }
   }, [searchParams]);
 
-  // Filter and sort products whenever filters change
+  // Fetch all products and update them when changes happen
   useEffect(() => {
-    let result = [...products];
+    // Function to load products
+    const loadProducts = () => {
+      // In a real app with Supabase, we would fetch products from the database
+      setAllProducts([...products]);
+    };
+
+    // Load products on mount
+    loadProducts();
+
+    // This ensures the products list is updated when a product is deleted
+    const intervalId = setInterval(loadProducts, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Filter and sort products whenever filters or products change
+  useEffect(() => {
+    let result = [...allProducts];
     
     // Filter by category
     if (selectedCategory && selectedCategory !== 'all') {
@@ -62,7 +80,7 @@ const Products = () => {
     }
     
     setFilteredProducts(result);
-  }, [selectedCategory, searchTerm, sortOrder]);
+  }, [selectedCategory, searchTerm, sortOrder, allProducts]);
 
   // Update URL when category changes
   const handleCategoryChange = (value: string) => {

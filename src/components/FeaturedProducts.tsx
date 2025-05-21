@@ -3,15 +3,27 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ProductCard from './ProductCard';
-import { getFeaturedProducts } from '@/lib/data';
+import { getFeaturedProducts, products } from '@/lib/data';
 import { Product } from '@/lib/types';
 
 const FeaturedProducts = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    setFeaturedProducts(getFeaturedProducts());
+    // Function to get featured products
+    const loadFeaturedProducts = () => {
+      // In a real app with Supabase, we would fetch products from the database
+      const featured = getFeaturedProducts();
+      setFeaturedProducts(featured);
+    };
+
+    // Load products on mount
+    loadFeaturedProducts();
+
+    // This ensures the featured products list is updated when a product is deleted
+    const intervalId = setInterval(loadFeaturedProducts, 1000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

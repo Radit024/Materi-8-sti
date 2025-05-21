@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,6 +46,7 @@ import { products, categories } from '@/lib/data';
 import { Product } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 import { Edit, Trash2, Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -70,8 +70,23 @@ const Dashboard = () => {
   useEffect(() => {
     // In a real app with Supabase authentication, we would check if the user is admin
     // For now, we'll just use the mock data
-    setAllProducts(products);
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      // In a real app, this would be a Supabase query
+      // For now, we'll use the mock data
+      setAllProducts(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load products. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Reset form data when opening add dialog
   useEffect(() => {
@@ -228,6 +243,14 @@ const Dashboard = () => {
     // In a real app, this would be an API call to Supabase
     // Update local state
     setAllProducts(prev => prev.filter(p => p.id !== productToEdit.id));
+    
+    // Update global product state in lib/data.js to keep consistency
+    // This ensures that when a product is deleted, it's also removed from the buyer's page
+    const productIndex = products.findIndex(p => p.id === productToEdit.id);
+    if (productIndex !== -1) {
+      products.splice(productIndex, 1);
+    }
+    
     setIsDeleteDialogOpen(false);
     
     toast({
