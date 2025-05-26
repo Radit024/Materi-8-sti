@@ -32,6 +32,3 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/9bf0c041-8a59-4bc6-9722-80a8dff33cb3) and click on Share -> Publish.
