@@ -125,7 +125,7 @@ const Profile = () => {
                   </Avatar>
                   {isSeller && (
                     <span className="bg-farm-dark-green text-farm-light-cream text-xs px-2 py-1 rounded-full">
-                      Seller Account
+                      Admin Account
                     </span>
                   )}
                 </div>
@@ -139,7 +139,7 @@ const Profile = () => {
                       <Button 
                         className="mt-4 bg-farm-dark-green hover:bg-farm-medium-green"
                       >
-                        Go to Seller Dashboard
+                        Go to Admin Dashboard
                       </Button>
                     </Link>
                   )}
